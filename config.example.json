@@ -1,6 +1,7 @@
 {
   "port": 8080,
   "pin": "",
+  "https": true,
   "driver": "pactl",
   "driverOptions": {
     "sink": "@DEFAULT_SINK@",

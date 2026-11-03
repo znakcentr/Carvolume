@@ -1,4 +1,5 @@
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { timingSafeEqual } from 'node:crypto';
@@ -68,8 +69,10 @@ function safeEqual(a, b) {
  * @param {string} opts.publicDir   папка со статикой сайта
  * @param {string} [opts.stateFile] куда сохранять состояние между перезапусками
  * @param {string} [opts.pin]       PIN-код для доступа (если пусто — без пароля)
+ * @param {{key:Buffer, cert:Buffer}} [opts.tls] если задано — сервер работает по HTTPS
+ * @param {Buffer} [opts.caCert]    корневой сертификат для установки на телефон
  */
-export async function createApp({ driver, publicDir, stateFile, pin = '' }) {
+export async function createApp({ driver, publicDir, stateFile, pin = '', tls, caCert }) {
   let state = defaultState();
   if (stateFile) {
     try {
@@ -180,6 +183,16 @@ export async function createApp({ driver, publicDir, stateFile, pin = '' }) {
       res.writeHead(405).end();
       return;
     }
+    // Корневой сертификат: открыв этот адрес на iPhone, его можно установить
+    // как профиль, чтобы Safari доверял сайту без предупреждений.
+    if (url.pathname === '/carvolume-ca.crt' && caCert) {
+      res.writeHead(200, {
+        'content-type': 'application/x-x509-ca-cert',
+        'content-disposition': 'attachment; filename="carvolume-ca.crt"',
+      });
+      res.end(req.method === 'HEAD' ? undefined : caCert);
+      return;
+    }
     let rel = decodeURIComponent(url.pathname);
     if (rel.endsWith('/')) rel += 'index.html';
     const file = path.resolve(publicDir, '.' + rel);
@@ -199,7 +212,7 @@ export async function createApp({ driver, publicDir, stateFile, pin = '' }) {
     }
   }
 
-  const server = http.createServer(async (req, res) => {
+  const handler = async (req, res) => {
     const url = new URL(req.url, 'http://localhost');
     try {
       if (url.pathname.startsWith('/api/')) await handleApi(req, res, url);
@@ -208,7 +221,8 @@ export async function createApp({ driver, publicDir, stateFile, pin = '' }) {
       if (!res.headersSent) sendJson(res, err.status ?? 500, { error: err.message });
       else res.end();
     }
-  });
+  };
+  const server = tls ? https.createServer(tls, handler) : http.createServer(handler);
 
   server.on('close', () => {
     for (const res of clients) res.end();
