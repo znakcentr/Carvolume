@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e1116">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Carvolume — динамики</title>
+  <meta name="description" content="Пульт управления динамиками автомобиля">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none"/></svg>
+      <span>Carvolume</span>
+    </div>
+    <button id="status" class="status" type="button" title="Состояние подключения">
+      <span class="dot"></span><span id="status-text">Подключение…</span>
+    </button>
+  </header>
+
+  <main class="layout">
+    <div class="col">
+    <section class="card car-card" aria-label="Динамики автомобиля">
+      <p class="hint">Нажмите на динамик, чтобы включить или выключить его</p>
+      <div class="car" id="car">
+        <svg class="car-body" viewBox="0 0 200 380" aria-hidden="true">
+          <rect class="body" x="20" y="10" width="160" height="360" rx="62"/>
+          <path class="glass" d="M42 108 Q100 82 158 108 L150 146 Q100 132 50 146 Z"/>
+          <path class="glass" d="M50 300 Q100 312 150 300 L156 330 Q100 348 44 330 Z"/>
+          <rect class="seat" x="48" y="168" width="44" height="48" rx="12"/>
+          <rect class="seat" x="108" y="168" width="44" height="48" rx="12"/>
+          <rect class="seat" x="48" y="236" width="104" height="44" rx="12"/>
+          <text class="front-label" x="100" y="48" text-anchor="middle">ПЕРЕД</text>
+        </svg>
+        <!-- кнопки динамиков создаются из app.js -->
+      </div>
+    </section>
+
+    <section class="card levels-card" aria-labelledby="levels-title">
+      <h2 id="levels-title">Уровни динамиков</h2>
+      <div id="levels" class="levels"></div>
+    </section>
+    </div>
+
+    <div class="col">
+    <section class="card presets-card" aria-labelledby="presets-title">
+      <h2 id="presets-title">Быстрые режимы</h2>
+      <div class="presets" id="presets"></div>
+    </section>
+
+    <section class="card master-card" aria-labelledby="master-title">
+      <div class="row-head">
+        <h2 id="master-title">Общая громкость</h2>
+        <output id="master-value" class="big-value">50%</output>
+      </div>
+      <div class="master-row">
+        <button id="mute" class="icon-btn" type="button" aria-pressed="false" title="Выключить звук">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9v6h4l5 4V5L8 9H4z"/><path class="waves" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="cross" d="M16 9l6 6M22 9l-6 6"/></svg>
+        </button>
+        <input id="master" type="range" min="0" max="100" step="1" value="50" aria-label="Общая громкость">
+      </div>
+    </section>
+
+    <section class="card pad-card" aria-labelledby="pad-title">
+      <div class="row-head">
+        <h2 id="pad-title">Баланс и фейдер</h2>
+        <button id="pad-reset" class="text-btn" type="button">По центру</button>
+      </div>
+      <div class="pad-wrap">
+        <span class="pad-label top">Перед</span>
+        <span class="pad-label bottom">Зад</span>
+        <span class="pad-label left">Л</span>
+        <span class="pad-label right">П</span>
+        <div id="pad" class="pad" role="slider" tabindex="0"
+             aria-label="Баланс и фейдер. Стрелки влево-вправо — баланс, вверх-вниз — фейдер"
+             aria-valuemin="-100" aria-valuemax="100">
+          <div class="pad-cross"></div>
+          <div id="pad-dot" class="pad-dot"></div>
+        </div>
+      </div>
+      <p class="pad-readout"><span id="balance-text">Баланс: центр</span> · <span id="fader-text">Фейдер: центр</span></p>
+    </section>
+
+    </div>
+  </main>
+
+  <dialog id="pin-dialog">
+    <form method="dialog" id="pin-form">
+      <h2>Введите PIN</h2>
+      <p>Пульт защищён PIN-кодом, заданным в настройках сервера.</p>
+      <input id="pin-input" type="password" inputmode="numeric" autocomplete="current-password" required>
+      <p id="pin-error" class="error" hidden>Неверный PIN</p>
+      <div class="dialog-actions">
+        <button type="submit" class="primary">Войти</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

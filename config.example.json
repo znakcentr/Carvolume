@@ -1,0 +1,9 @@
+{
+  "port": 8080,
+  "pin": "",
+  "driver": "pactl",
+  "driverOptions": {
+    "sink": "@DEFAULT_SINK@",
+    "channelOrder": ["fl", "fr", "rl", "rr"]
+  }
+}
